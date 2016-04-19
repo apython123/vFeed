@@ -8,14 +8,17 @@ import sys
 import re
 from config.constants import db
 from lib.core.methods import CveExploit
+from lib.core.methods import CveRisk
 from lib.common.database import Database
 
 
 class Search(object):
-    def __init__(self, query):
+    def __init__(self, query, ishighonly):
         self.query = query
         self.db = db
+        self.ishighonly = ishighonly
         self.detect_entry()
+
 
     def detect_entry(self):
         """ detect user input entry (CVE, CPE, OVAL or CWE). Used for Search method
@@ -86,7 +89,14 @@ class Search(object):
             self.cve_datas = self.cur.fetchall()
             for self.cve_data in self.cve_datas:
                 self.mycve = self.cve_data[0]
-                print '\t\t|-> %s' % self.mycve
+                if self.ishighonly :
+                    crs = CveRisk(self.mycve)
+                    severity = crs.get_severity()
+                    #print  '\t\t\t\t|----> %s' % crs.level
+                    if crs.level == "High" :
+                        print '\t\t|-> %s' % self.mycve
+                else:
+                    print '\t\t|-> %s' % self.mycve
                 self.check_exploit(self.mycve)
         print '[+] Printing search statistics for %s' % self.cpe
         print '\t [-] Total Unique CVEs        [%s] ' % self.count_cve

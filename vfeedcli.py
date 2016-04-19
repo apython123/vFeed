@@ -35,10 +35,14 @@ if __name__ == "__main__":
     parser.add_argument("--list", help="Enumerate the list of available methods", action="store_true", required=False)
     parser.add_argument("--banner", help="Print vFeed banner", action="store_true", required=False)
     parser.add_argument("--migrate", help="Migration to MongoDB", action="store_true", required=False)
+    parser.add_argument("-t", "--hsearch", metavar="id", type=str,
+                        help="Search High risk vuln for CVE,CPE,CWE, OVAL or free text")
     args = parser.parse_args()
 
     if args.search:
-        Search(args.search)
+        Search(args.search, False)
+    if args.hsearch:
+        Search(args.hsearch, True)
     elif args.update:
         Update().update()
     elif args.banner:
